@@ -14,3 +14,18 @@ CrediTrust Financial receives thousands of customer complaints monthly across mu
 
 ## Status
 🚧 In progress – Task 1 & Task 2
+
+# CrediTrust RAG Pipeline
+
+A Retrieval-Augmented Generation system for analyzing financial customer complaints.
+
+## Project Structure
+
+
+## Setup Instructions
+
+1. **Clone/Create the project structure:**
+   ```bash
+   mkdir creditrust-rag-project
+   cd creditrust-rag-project
+   mkdir data src tests notebooks

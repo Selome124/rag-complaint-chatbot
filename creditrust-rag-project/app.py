@@ -1,4 +1,6 @@
-﻿# app.py - CrediTrust RAG Chat Interface (Fixed Version)
+﻿# Replace app.py with fixed version
+'@'
+# app.py - CrediTrust RAG Chat Interface (Fixed Version)
 import gradio as gr
 import sys
 import os
@@ -33,10 +35,6 @@ class RAGChatInterface:
                 
         except ImportError as e:
             print(f"⚠️ Could not import RAG modules: {e}")
-            print("Using demonstration mode")
-            self.rag_system = None
-        except Exception as e:
-            print(f"⚠️ Error initializing RAG: {e}")
             print("Using demonstration mode")
             self.rag_system = None
     
@@ -116,38 +114,70 @@ def create_interface():
     
     rag_interface = RAGChatInterface()
     
-    with gr.Blocks() as demo:
+    # Custom CSS for better styling
+    custom_css = """
+    .gradio-container {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .title {
+        text-align: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 20px;
+        color: white;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+    .footer {
+        text-align: center;
+        margin-top: 20px;
+        color: #666;
+        font-size: 0.9em;
+    }
+    .user-message {
+        background-color: #e3f2fd;
+        padding: 10px;
+        border-radius: 10px;
+        margin: 5px;
+    }
+    .bot-message {
+        background-color: #f1f8e9;
+        padding: 10px;
+        border-radius: 10px;
+        margin: 5px;
+    }
+    """
+    
+    with gr.Blocks(css=custom_css, theme=gr.themes.Soft()) as demo:
         
         # Header
         gr.HTML("""
-        <div style="text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                   padding: 20px; color: white; border-radius: 10px; margin-bottom: 20px;">
-            <h1 style="margin: 0;">🏦 CrediTrust Complaint Analyst</h1>
-            <p style="margin: 10px 0 0 0;">AI-powered assistant for customer financial complaints</p>
+        <div class="title">
+            <h1>🏦 CrediTrust Complaint Analyst</h1>
+            <p>AI-powered assistant for customer financial complaints</p>
         </div>
         """)
         
         # Chat interface
         chatbot = gr.Chatbot(
-            label="Conversation History",
+            label="Conversation",
             height=400
         )
         
         # Question input
         with gr.Row():
-            question_input = gr.Textbox(
+            question = gr.Textbox(
                 label="Your Question",
                 placeholder="Ask about customer complaints...",
-                lines=2
+                lines=2,
+                scale=4
             )
-        
-        # Buttons
-        with gr.Row():
-            submit_btn = gr.Button("Submit Question", variant="primary")
-            clear_btn = gr.Button("Clear Chat", variant="secondary")
+            
+            with gr.Column(scale=1):
+                submit_btn = gr.Button("Submit", variant="primary")
+                clear_btn = gr.Button("Clear", variant="secondary")
         
         # Status
-        status_display = gr.Textbox(
+        status = gr.Textbox(
             label="Status",
             value="✅ Ready to answer questions about customer complaints",
             interactive=False
@@ -161,23 +191,33 @@ def create_interface():
                 "What should customers do about unauthorized transactions?",
                 "What mortgage servicing issues are reported?"
             ],
-            inputs=question_input,
+            inputs=question,
             label="Try these example questions:"
         )
         
+        # Information
+        gr.Markdown("""
+        ---
+        **About this system:**
+        - Answers based on retrieved complaint data
+        - Shows sources for transparency
+        - Designed for CrediTrust financial analysts
+        """)
+        
         # Functions
-        def respond(message, history):
+        def respond(user_message, chat_history):
             """Process user message"""
-            if not message.strip():
-                return "", history, "Please enter a question"
+            if not user_message.strip():
+                return "", chat_history, "Please enter a question"
             
             # Get AI response
-            ai_response = rag_interface.get_response(message)
+            ai_response = rag_interface.get_response(user_message)
             
-            # Append to history in correct format
-            history.append((message, ai_response))
+            # Update chat history
+            chat_history.append((user_message, ai_response))
             
-            return "", history, f"✓ Answered at {datetime.now().strftime('%H:%M:%S')}"
+            # Clear input and update status
+            return "", chat_history, f"✓ Answered at {datetime.now().strftime('%H:%M:%S')}"
         
         def clear_chat():
             """Clear the chat"""
@@ -186,20 +226,20 @@ def create_interface():
         # Event handlers
         submit_btn.click(
             fn=respond,
-            inputs=[question_input, chatbot],
-            outputs=[question_input, chatbot, status_display]
+            inputs=[question, chatbot],
+            outputs=[question, chatbot, status]
         )
         
-        question_input.submit(
+        question.submit(
             fn=respond,
-            inputs=[question_input, chatbot],
-            outputs=[question_input, chatbot, status_display]
+            inputs=[question, chatbot],
+            outputs=[question, chatbot, status]
         )
         
         clear_btn.click(
             fn=clear_chat,
             inputs=[],
-            outputs=[question_input, chatbot, status_display]
+            outputs=[question, chatbot, status]
         )
     
     return demo
@@ -216,5 +256,9 @@ if __name__ == "__main__":
     interface.launch(
         server_name="127.0.0.1",
         server_port=7860,
-        share=False
+        share=False,
+        inbrowser=True
     )
+'@ | Out-File -FilePath "app.py" -Encoding utf8 -Force
+
+Write-Host "✓ Fixed app.py created!" -ForegroundColor Green
